@@ -18,17 +18,95 @@ angular
     $stateProvider
       .state('home', {
         url: '/',
-        templateUrl: 'home/home.html'
+        templateUrl: 'home/home.html',
+        resolve: {
+          requireNoAuth: function($state, Auth){
+            return Auth.$requireAuth().then(function(auth){
+              $state.go('channels');
+            }, function(error){
+              return;
+            });
+          }
+        }
       })
       .state('login', {
         url: '/login',
-        templateUrl: 'auth/login.html'
+        controller: 'AuthCtrl as authCtrl',
+        templateUrl: 'auth/login.html',
+        resolve: {
+          requireNoAuth: function($state, Auth){
+            return Auth.$requireAuth().then(function(auth){
+              $state.go('home');
+            }, function(error){
+              return;
+            });
+          }
+        }
       })
       .state('register', {
-        url: '/register',
-        templateUrl: 'auth/register.html'
+          url: '/register',
+          controller: 'Authctrl as authCtrl',
+          templateUrl: 'auth/register.html',
+          resolve: {
+            requireNoAuth: function($state, Auth){
+              return Auth.$requireAuth().then(function(auth){
+                $state.go('home');
+              }, function(error){
+                return;
+              });
+            }
+          }
+      })
+
+      .state('channels', {
+        url: '/channels',
+        controller: 'ChannelsCtrl as channelsCtrl',
+        templateUrl: 'channels/index.html',
+        resolve: {
+          channels: function(Channels) {
+            return Channels.$loaded();
+          },
+          profile: function($state, Auth, Users) {
+            return Auth.$requireAuth().then(function(auth) {
+              return Users.getProfile(auth.uid).$loaded().then(function(profile) {
+                if(profile.displayName) {
+                  return profile;
+                } else {
+                  $state.go('profile');
+                }
+              });
+            }, function(error) {
+              $state.go('home');
+            });
+          }
+        }
+      })
+
+      .state('channels.create', {
+        url: '/create',
+        templateUrl: 'channels/create.html',
+        controller: 'ChannelsCtrl as channelsCtrl'
+      })
+
+      .state('profile', {
+        url: '/profile',
+        controller: 'PofileCtrl as profileCtrl',
+        template: 'users/profile.html',
+        resolve: {
+          auth: function($state, Users, Auth) {
+            return Auth.$requireAuth().catch(function(auth) {
+              $state.go('home');
+            });
+          },
+
+          profile: function(Users, Auth) {
+            return Auth.$requireAuth().then(function(auth) {
+              return Users.getProfile(auth.uid).$loaded();
+            });
+          }
+        }
       });
 
     $urlRouterProvider.otherwise('/');
   })
-  .constant('FirebaseUrl', 'https://fireslack-4c0a0.firebaseapp.com');
+  .constant('FirebaseUrl', 'https://fireslack-4c0a0.firebaseio.com/');

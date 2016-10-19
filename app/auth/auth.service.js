@@ -4,5 +4,4 @@ angular.module('angularfireSlackApp')
         var auth = $firebaseAuth(ref);
 
         return auth;
-
     });
