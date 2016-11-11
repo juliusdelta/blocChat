@@ -1,4 +1,4 @@
-angular.module('angularfireSlackApp')
+angular.module('blocChat')
   .controller('ChannelsCtrl', function($state, Auth, Users, profile, channels) {
     var channelsCtrl = this;
 
@@ -9,7 +9,7 @@ angular.module('angularfireSlackApp')
     channelsCtrl.getGravatar = Users.getGravatar;
 
     channelsCtrl.logout = function() {
-      Auth.$unauth();
+      Auth.$signOut();
       $state.go('home');
     }
 
@@ -18,10 +18,8 @@ angular.module('angularfireSlackApp')
     };
 
     channelsCtrl.createChannel = function() {
-      channelsCtrl.channels.$add(channelsCtrl.newChannel).then(function() {
-        channelsCtrl.newChannel = {
-          name: ''
-        };
-      })
-    }
+      channelsCtrl.channels.$add(channelsCtrl.newChannel).then(function(ref) {
+        $state.go('channels.messages', {channelId: ref.key()});
+      });
+    };
   });

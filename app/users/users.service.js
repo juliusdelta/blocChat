@@ -1,11 +1,16 @@
-angular.module('angularfireSlackApp')
-  .factory('Users', function($firebaseArray, $firebaseObject, FirebaseUrl) {
-    var usersRef = new Firebase(FirebaseUrl+'users');
-    var users = $firebaseArray(usersRef);
+angular.module('blocChat')
+  .factory('Users', function($firebaseArray, $firebaseObject, config) {
+
+    firebase.initializeApp(config);
+    
+    var rootRef = firebase.database().ref();
+    var ref = firebase.database().ref().child('/users');
+   
+    var users = $firebaseArray(ref);
 
     var Users = {
       getProfile: function(uid) {
-        return $firebaseObject(usersRef.child(uid));
+        return $firebaseObject(ref.child(uid));
       },
 
       getDisplayName: function(uid) {

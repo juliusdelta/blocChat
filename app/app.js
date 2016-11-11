@@ -2,14 +2,14 @@
 
 /**
  * @ngdoc overview
- * @name angularfireSlackApp
+ * @name blocChat
  * @description
- * # angularfireSlackApp
+ * # blocChat
  *
  * Main module of the application.
  */
 angular
-  .module('angularfireSlackApp', [
+  .module('blocChat', [
     'firebase',
     'angular-md5',
     'ui.router'
@@ -21,7 +21,7 @@ angular
         templateUrl: 'home/home.html',
         resolve: {
           requireNoAuth: function($state, Auth){
-            return Auth.$requireAuth().then(function(auth){
+            return Auth.$requireSignIn().then(function(auth){
               $state.go('channels');
             }, function(error){
               return;
@@ -35,7 +35,7 @@ angular
         templateUrl: 'auth/login.html',
         resolve: {
           requireNoAuth: function($state, Auth){
-            return Auth.$requireAuth().then(function(auth){
+            return Auth.$requireSignIn().then(function(auth){
               $state.go('home');
             }, function(error){
               return;
@@ -45,11 +45,11 @@ angular
       })
       .state('register', {
           url: '/register',
-          controller: 'Authctrl as authCtrl',
+          controller: 'AuthCtrl as authCtrl',
           templateUrl: 'auth/register.html',
           resolve: {
             requireNoAuth: function($state, Auth){
-              return Auth.$requireAuth().then(function(auth){
+              return Auth.$requireSignIn().then(function(auth){
                 $state.go('home');
               }, function(error){
                 return;
@@ -67,7 +67,7 @@ angular
             return Channels.$loaded();
           },
           profile: function($state, Auth, Users) {
-            return Auth.$requireAuth().then(function(auth) {
+            return Auth.$requireSignIn().then(function(auth) {
               return Users.getProfile(auth.uid).$loaded().then(function(profile) {
                 if(profile.displayName) {
                   return profile;
@@ -78,6 +78,20 @@ angular
             }, function(error) {
               $state.go('home');
             });
+          }
+        }
+      })
+
+      .state('channels.messages', {
+        url: '/{channelId}/messages',
+        templateUrl: 'channels/messages.html',
+        controller: 'MessagesCtrl as messagesCtrl',
+        resolve: {
+          messages: function($stateParams, Messages) {
+            return Messages.forChannel($stateParams.channelId).$loaded();
+          },
+          channelName: function($stateParams, channels) {
+            return '#'+channels.$getRecord($stateParams.channelId).name;
           }
         }
       })
@@ -94,13 +108,13 @@ angular
         template: 'users/profile.html',
         resolve: {
           auth: function($state, Users, Auth) {
-            return Auth.$requireAuth().catch(function(auth) {
+            return Auth.$requireSignIn().catch(function(auth) {
               $state.go('home');
             });
           },
 
           profile: function(Users, Auth) {
-            return Auth.$requireAuth().then(function(auth) {
+            return Auth.$requireSignIn().then(function(auth) {
               return Users.getProfile(auth.uid).$loaded();
             });
           }
@@ -109,4 +123,9 @@ angular
 
     $urlRouterProvider.otherwise('/');
   })
-  .constant('FirebaseUrl', 'https://fireslack-4c0a0.firebaseio.com/');
+
+.constant('config', {
+  apiKey: "AIzaSyDH1dwgpVESlgAl-jmggjOHSTg2E6jfoIw",
+  authDomain: "fireslack-4c0a0.firebaseapp.com",
+  databaseURL: "https://fireslack-4c0a0.firebaseio.com"
+});
