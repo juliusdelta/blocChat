@@ -12,7 +12,7 @@ angular.module('blocChat')
         messagesCtrl.messages.$add({
           uid: profile.$id,
           body: messagesCtrl.message,
-          timestamp: Firebase.ServerValue.TIMESTAMP
+          timestamp: firebase.database.ServerValue.TIMESTAMP
         }).then(function (){
           messagesCtrl.message = '';
         });

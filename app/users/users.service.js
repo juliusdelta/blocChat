@@ -1,10 +1,8 @@
 angular.module('blocChat')
-  .factory('Users', function($firebaseArray, $firebaseObject, config) {
-
-    firebase.initializeApp(config);
+  .factory('Users', function($firebaseArray, $firebaseObject) {
     
     var rootRef = firebase.database().ref();
-    var ref = firebase.database().ref().child('/users');
+    var ref = firebase.database().ref().child('users');
    
     var users = $firebaseArray(ref);
 

@@ -19,7 +19,7 @@ angular.module('blocChat')
 
     channelsCtrl.createChannel = function() {
       channelsCtrl.channels.$add(channelsCtrl.newChannel).then(function(ref) {
-        $state.go('channels.messages', {channelId: ref.key()});
+        $state.go('channels.messages', {channelName: ref.key});
       });
     };
   });

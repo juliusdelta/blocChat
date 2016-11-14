@@ -36,6 +36,7 @@ angular
         resolve: {
           requireNoAuth: function($state, Auth){
             return Auth.$requireSignIn().then(function(auth){
+              console.log("logging user in");
               $state.go('home');
             }, function(error){
               return;
@@ -76,6 +77,7 @@ angular
                 }
               });
             }, function(error) {
+              console.log("the error is " + error)
               $state.go('home');
             });
           }
@@ -87,10 +89,11 @@ angular
         templateUrl: 'channels/messages.html',
         controller: 'MessagesCtrl as messagesCtrl',
         resolve: {
-          messages: function($stateParams, Messages) {
+          messages: function($stateParams, Messages){
+            console.log("attempting to load messages...") //DELETE
             return Messages.forChannel($stateParams.channelId).$loaded();
           },
-          channelName: function($stateParams, channels) {
+          channelName: function($stateParams, channels){
             return '#'+channels.$getRecord($stateParams.channelId).name;
           }
         }
@@ -104,8 +107,8 @@ angular
 
       .state('profile', {
         url: '/profile',
-        controller: 'PofileCtrl as profileCtrl',
-        template: 'users/profile.html',
+        controller: 'ProfileCtrl as profileCtrl',
+        templateUrl: 'users/profile.html',
         resolve: {
           auth: function($state, Users, Auth) {
             return Auth.$requireSignIn().catch(function(auth) {
